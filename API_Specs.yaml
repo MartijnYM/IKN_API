@@ -1,0 +1,3148 @@
+openapi: 3.0.3
+info:
+  title: API Profiel Oriënteren
+  version: "0.1.2"
+  description: >-
+    Deze api beschrijft het API Profiel Oriënteren wat door leveranciers van informatieproducten geïmplementeerd moet worden om aan te sluiten bij het dso.
+    
+    
+    Door gebruik te maken van een omgevingsaspect kan er een koppeling gelegd worden tussen informatie uit de omgevingswet en informatie van de leverancier van informatie producten. 
+    
+    
+    Hieronder is in tekst weergegeven wat de relatie tussen de verschillende begrippen is. Een begrip wordt 'vet' weergegeven. De relatie wordt weergegeven door '- \<naam\> ->'. Onder elk begrip staat een voorbeeld.
+    
+    - WERKZAAMHEID: een in dso gedefinieerde lijst met werkzaamheden
+    
+    - ACTIVITEIT: een door het bevoegd gezag gedefinieërde activiteit
+    
+    - ACTIVITEITEN GROEP: een in dso gedefinieerde lijst met activiteiten
+    
+    - OMGEVINGSASPECT: een door een leverancier van informatie producten geregistreerde naam, om de relatie tussen activiteit en thema vast te leggen <b><i>(PS ik zou verwachten dat dit een relatie is tussen activiteiten groep en thema, omdat activiteiten een oneindige lijst is en activiteitengroep een vastgestelde set)</i></b>
+    
+    - THEMA: een in dso gedefinieerde lijst met thema's
+    
+    - SUBSET: een subset van de informatie die door een leverancier van informatie producten geleverd kan worden
+    
+    - INFORMATIEPRODUCT: de naam van een informatie product waaronder meerdere subsets kunnen vallen
+    
+    <table>
+      <tr><td></td><td>relatie naam</td><td></td><td>relatie naam</td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td><b>WERKZAAMHEID</b></td><td>- leidt tot -></td><td><b>ACTIVITEIT</b></td><td>- is lid van -></td><td><b>ACTIVITEITEN GROEP</b></td></tr>
+      <tr><td>Kappen boom</td><td></td><td>Vellen van een houtopstand</td><td></td><td>Gebruiksactiviteit</td></tr>
+      <tr><td></td><td></td><td>^</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>is van toepassing op</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td><b>OMGEVINGSASPECT</b></td><td>- heeft betrekking op -></td><td><b>THEMA</b></td></tr>
+      <tr><td></td><td></td><td>Groenbeheer</td><td></td><td>Natuur</td></tr>      
+      <tr><td></td><td></td><td>^</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>is relevant voor</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td><b>SUBSET</b></td><td></td><td></td></tr>      
+      <tr><td></td><td></td><td>Beschermde Bomen</td><td></td><td></td></tr>      
+      <tr><td></td><td></td><td>^</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>levert</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td>|</td><td></td><td></td></tr>
+      <tr><td></td><td></td><td><b>INFORMATIEPRODUCT</b></td><td></td><td></td></tr>      
+      <tr><td></td><td></td><td>Natuur</td><td></td><td></td></tr>
+    </table>
+servers:
+  - url: >-
+      https://service.omgevingswet.overheid.nl/publiek/api/{version}/{informatieproduct}
+    description: >-
+      De Informatieproduct API
+    variables:
+      version:
+        enum:
+          - v1
+        default: v1
+      informatieproduct:
+        enum:
+          - externeveiligheid
+          - geluid
+          - natuur
+          - wkpb
+        default: natuur
+        description: >-
+          Dit is een lijst van de ondersteunde informatieproducten
+tags:
+  -
+    name: Kaartlagen
+    description: >-
+      De kaartlagen in de IKN
+  -    
+    name: Natuurregels
+    description: >-
+      De natuurregels in de IKN
+  -
+    name: Locaties
+    description: >-
+      De locaties in de IKN
+  -
+    name: OmgevingsAspecten
+    description: >-
+      De omgevingsaspecten die relevant zijn voor een of meer subset(s) van dit informatieproduct
+  -
+    name: Subsets
+    description: >-
+      Een opsomming van alle subsets die bekend zijn voor dit informatieproduct
+  -
+    name: Subset Metadata
+    description: >-
+      De informatie over een specifieke subset van dit informatie product
+  -
+    name: Subsets Zoeken
+    description: >-
+      Zoeken naar informatie op een locatie met één of meer omgevingsaspecten
+  - 
+    name: MetaData
+    description: >-
+      De metadata van dit informatieproduct
+paths:
+  /kaartlagen:
+    get:
+      tags: 
+        - Kaartlagen
+      summary: Haal alle kaartlagen in de IKN op
+      description: >-
+        Alle kaartlagen in de IKN worden hiermee opgehaald
+      operationId: getKaartlagen
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                    response:
+                      $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Onverwacht probleem
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /kaartlagen/{identificatie}:
+    get:
+      tags: 
+        - Kaartlagen
+      summary: Een enkele kaartlaag ophalen
+      description: >-
+        De kaartlaag van de parameter wordt hiermee opgehaald
+      operationId: getKaartlaag
+      parameters:
+        - $ref: '#/components/parameters/Identificatie'    
+      responses:
+          '200':
+            description: Kaartlaag
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlaag'
+                examples:
+                    response:
+                      $ref: '#/components/examples/KaartlaagResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /kaartlagen/{identificatie}/natuurregels:
+    get:
+      tags: 
+        - Kaartlagen
+      summary: Natuurregels van een enkele kaartlaag ophalen
+      description: >-
+        Alle natuurregels van de kaartlaag van de parameter worden hiermee opgehaald
+      operationId: getKaartlaagNatuurregel
+      parameters:
+        - $ref: '#/components/parameters/Identificatie'
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+          '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NatuurregelsResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /kaartlagen/{identificatie}/locatie:
+    get:
+      tags: 
+        - Kaartlagen
+      summary: Locaties van een enkele kaartlaag ophalen
+      description: >-
+        Alle locaties van de kaartlaag van de parameter worden hiermee opgehaald
+      operationId: getKaartlaagLocaties
+      parameters:
+        - $ref: '#/components/parameters/Identificatie'
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'   
+      responses:
+          '200':
+            description: Locaties
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locaties'
+                examples:
+                  response:
+                    $ref: '#/components/examples/LocatiesResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /kaartlagen/_beleidtype:
+    post:
+      tags: 
+        - Kaartlagen
+      summary: Kaartlagen ophalen van de gekozen beleidType
+      description: >-
+        Alle kaartlagen van de gekozen beleidType worden opgehaald
+      operationId: zoekKaartlaagBeleidtype
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              beleidType: "Beschermd Natuurgebied"
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                  response:
+                    $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /kaartlagen/_beleidnaam:
+    post:
+      tags: 
+        - Kaartlagen
+      summary: Kaartlagen ophalen van de gekozen beleidNaam
+      description: >-
+        Alle kaartlagen van de gekozen beleidNaam worden opgehaald
+      operationId: zoekKaartlaagBeleidnaam
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              beleidNaam: "Natuurnetwerk Nederland"
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                  response:
+                    $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  
+  /kaartlagen/_geografie:
+    post:
+      tags: 
+        - Kaartlagen
+      summary: Kaartlagen ophalen in de gekozen geografische locatie
+      description: >-
+        Alle kaartlagen van de gekozen geografische locatie worden opgehaald
+      operationId: zoekKaartlaagGeografie
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoZoekobject'
+            #examples:
+            #  geozoekobjectWaterschapsverordening:
+            #    $ref: '#/components/examples/geozoekobjectWaterschapsverordening'
+        required: true
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                  response:
+                    $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels:
+    get:
+      tags: 
+        - Natuurregels
+      summary: Haal alle natuurregels in de IKN op
+      description: >-
+        Alle natuurregels in de IKN worden hiermee opgehaald
+      operationId: getNatuurregels
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                    response:
+                      $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/{identificatie}:
+    get:
+      tags: 
+        - Natuurregels
+      summary: Een enkele natuurregel ophalen
+      description: >-
+        Een enkele natuurregel in de IKN wordt hiermee opgehaald
+      operationId: getNatuurregel
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieNatuurregel'
+      responses:
+          '200':
+            description: Natuurregel
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregel'
+                examples:
+                    response:
+                      $ref: '#/components/examples/NatuurregelResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/{identificatie}/kaartlagen:
+    get:
+      tags: 
+        - Natuurregels
+      summary: Kaartlagen waar het gekozen natuurregel in geldt
+      description: >-
+        Alle kaartlagen ophalen waarin het gekozen natuurbeleid in geldt
+      operationId: getNatuurregelKaartlagen
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieNatuurregel'
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+          '200':
+            description: Kaartlagen
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                  response:
+                    $ref: '#/components/examples/KaartlagenResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/{identificatie}/locatie:
+    get:
+      tags: 
+        - Natuurregels
+      summary: Locaties waar het gekozen natuurregel in geldt
+      description: >-
+        Alle locaties van de natuurregel van de parameter worden hiermee opgehaald
+      operationId: getNatuurLocaties
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieNatuurregel'
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+          '200':
+            description: Locaties
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locaties'
+                examples:
+                  response:
+                    $ref: '#/components/examples/LocatiesResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/_beleidbron:
+    post:
+      tags: 
+        - Natuurregels
+      summary: Natuurregels van een bepaalde bron ophalen
+      description: >-
+        Alle natuurregels van de gekozen bronhouder worden opgehaald
+      operationId: zoekNatuurregelBron
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              beleidBron: "Omgevingsverordening Utrecht"
+      responses:
+          '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NatuurregelsResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/_begindatum:
+    post:
+      tags: 
+        - Natuurregels
+      summary: Natuurregels van een bepaalde begin datum ophalen
+      description: >-
+        Alle natuurregels van de gekozen begin datum worden opgehaald
+      operationId: zoekNatuurregelBegin
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              beginDatum: "1/1/2022"
+      responses:
+          '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NatuurregelsResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/_einddatum:
+    post:
+      tags: 
+        - Natuurregels
+      summary: Natuurregels van een bepaalde eind datum ophalen
+      description: >-
+        Alle natuurregels van de gekozen eind datum worden opgehaald
+      operationId: zoekNatuurregelEind
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              eindDatum: "1/1/2022"
+      responses:
+          '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NatuurregelsResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /natuurregels/_brondatum:
+    post:
+      tags: 
+        - Natuurregels
+      summary: Natuurregels van een bepaalde bron datum ophalen
+      description: >-
+        Alle natuurregels van de gekozen bron datum worden opgehaald
+      operationId: zoekNatuurregelBrondatum
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              bronDatum: "1/1/2022"
+      responses:
+          '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NatuurregelsResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem' 
+  /locaties:
+    summary: De locaties in de IKN
+    description: De locaties van de IKN met de bronhouder en geometrie
+    get:
+      tags:
+        - Locaties
+      summary: Haal alle locaties op uit de IKN
+      description: >-
+        De lijst met alle locaties in het IKN
+      operationId: locaties
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+        '200':
+            description: Locaties
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locaties'
+                examples:
+                    response:
+                      $ref: '#/components/examples/LocatiesResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /locaties/{identificatie}:
+    get:
+      tags:
+        - Locaties
+      summary: Een enkele locatie ophalen
+      description: >-
+        Haal een enkele locatie op uit de IKN
+      operationId: getLocatie
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieLocatie'
+      responses:
+        '200':
+            description: Locatie
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locatie'
+                examples:
+                    response:
+                      $ref: '#/components/examples/LocatieResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /locaties/{identificatie}/geometrie:
+    get:
+      tags:
+        - Locaties
+      summary: Geometrie ophalen van een locatie
+      description: >-
+        Haal geometrie op van een enkele locatie uit de IKN
+      operationId: getLocatieGeometrie  
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieLocatie'
+        - $ref: '#/components/parameters/AcceptCrsHeader'
+      responses:
+        '200':
+          description: Locatie
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/GeoJsonGeometry'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /locaties/{identificatie}/kaartlagen:
+    get:
+      tags:
+        - Locaties
+      summary: Kaartlaag ophalen van een locatie
+      description: >-
+        Haal kaartlaag op van een enkele locatie uit de IKN
+      operationId: getLocatieKaartlaag
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieLocatie'
+      responses:
+        '200':
+            description: Kaartlagen
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Kaartlagen'
+                examples:
+                    response:
+                      $ref: '#/components/examples/KaartlaagResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /locaties/{identificatie}/natuurregels:
+    get:
+      tags:
+        - Locaties
+      summary: Natuurregels ophalen van een locatie
+      description: >-
+        Haal natuurregels op van een enkele locatie uit de IKN
+      operationId: getLocatieNatuurregels
+      parameters:
+        - $ref: '#/components/parameters/IdentificatieLocatie'
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      responses:
+        '200':
+            description: Natuurregels
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Natuurregels'
+                examples:
+                    response:
+                      $ref: '#/components/examples/NatuurregelsResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /locaties/_bronhouder:
+    post:
+      tags: 
+        - Locaties
+      summary: Locaties ophalen van de gekozen bronhouder
+      description: >-
+        Alle locaties van de gekozen bronhouder worden opgehaald
+      operationId: zoekLocatieBron
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              type: object
+            example: 
+              bronhouder: "Provincie Utrecht"
+      responses:
+          '200':
+            description: Locaties
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locaties'
+                examples:
+                    response:
+                      $ref: '#/components/examples/LocatiesResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /locaties/_geografie:
+    post:
+      tags: 
+        - Locaties
+      summary: Locaties ophalen in de gekozen geografische locatie
+      description: >-
+        Alle locaties van de gekozen geografische locatie worden opgehaald
+      operationId: zoekLocatieGeografie
+      parameters:
+        - name: page
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: size
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+            example: 20
+        - name: sort
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: 'id,desc'
+      requestBody:
+        description: Zoekobject
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoZoekobject'
+            #examples:
+            #  geozoekobjectWaterschapsverordening:
+            #    $ref: '#/components/examples/geozoekobjectWaterschapsverordening'
+        required: true
+      responses:
+          '200':
+            description: Locaties
+            headers:
+              X-Total-Count:
+                $ref: '#/components/headers/X-Total-Count'
+              X-Pagination-Count:
+                $ref: '#/components/headers/X-Pagination-Count'
+              X-Pagination-Page:
+                $ref: '#/components/headers/X-Pagination-Page'
+              X-Pagination-Limit:
+                $ref: '#/components/headers/X-Pagination-Limit'
+            content:
+              application/hal+json:
+                schema:
+                  $ref: '#/components/schemas/Locaties'
+                examples:
+                  response:
+                    $ref: '#/components/examples/LocatiesResponse'
+          '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+                examples:
+                  response:
+                    $ref: '#/components/examples/NotFoundResponse'
+          default:
+            description: Default error sample response
+            content:
+              application/problem+json:
+                schema:
+                  $ref: '#/components/schemas/Problem'
+  /omgevingsaspecten:
+    summary: De omgevingsaspecten voor dit informatieproduct
+    description: De omgevingsaspecten die relevant zijn voor één of meer subset(s) van dit informatieproduct
+    get:
+      tags:
+        - OmgevingsAspecten
+      summary: Bepaal de lijst met omgevingsaspect die relevant zijn voor één of meer subsets
+      description: >-
+        De lijst met omgevingsaspecten en de daaraan gekoppelde subsets
+      operationId: omgevingsaspecten
+      responses:
+        '200':
+          description: Bepaal de lijst met omgevingsaspect die relevant zijn voor één of meer subsets
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Pagination-Count:
+              $ref: '#/components/headers/X-Pagination-Count'
+            X-Pagination-Page:
+              $ref: '#/components/headers/X-Pagination-Page'
+            X-Pagination-Limit:
+              $ref: '#/components/headers/X-Pagination-Limit'
+          content:
+            application/hal+json:
+              schema:
+                required:
+                  - _embedded
+                  - _links
+                  - page
+                type: object
+                properties:
+                  _embedded:
+                    required:
+                      - omgevingsaspecten
+                    type: object
+                    properties:
+                      omgevingsaspecten:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OmgevingsAspect'
+                  _links:
+                    $ref: '#/components/schemas/HalPaginationLinks'
+                  page:
+                    $ref: '#/components/schemas/Page'
+              examples:
+                response:
+                  $ref: '#/components/examples/OmgevingsAspectenResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /subsets:
+    summary: Opsomming van subsets en metadata voor dit informatieproduct
+    description: De opsomming van de subsets en de metadata die voor dit informatieproduct relevant zijn
+    get:
+      tags:
+        - Subsets
+      summary: Bepaal de subsets voor dit informatieproduct
+      description: >-
+        Bepaal de informatie voor de subsets van dit informatie product. Als resultaat wordt de volgende informatie geleverd:
+      
+        - laatstbijgewerkt, de laatste datum waarop het informatieproduct geactualiseerd is   
+        
+        - omschrijving
+        
+        - omgevingsaspecten
+        
+        - gebied
+        
+      operationId: subsets
+      responses:
+        '200':
+          description: Een lijst met subsets voor dit informatieproduct
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Pagination-Count:
+              $ref: '#/components/headers/X-Pagination-Count'
+            X-Pagination-Page:
+              $ref: '#/components/headers/X-Pagination-Page'
+            X-Pagination-Limit:
+              $ref: '#/components/headers/X-Pagination-Limit'
+          content:
+            application/hal+json:
+              schema:
+                required:
+                  - _embedded
+                  - _links
+                  - page
+                type: object
+                properties:
+                  _embedded:
+                    required:
+                      - subsets
+                    type: object
+                    properties:
+                      subsets:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Subset'
+                  _links:
+                    $ref: '#/components/schemas/HalPaginationLinks'
+                  page:
+                    $ref: '#/components/schemas/Page'
+              examples:
+                response:
+                  $ref: '#/components/examples/SubsetResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /subsets/{subset}:
+    summary: Informatie over deze subset van dit informatieproduct
+    description: Informatie over deze subset die van dit informatieproduct
+    get:
+      tags:
+        - Subset Metadata
+      summary: Bepaal de metadata van deze subset van dit informatieproduct
+      description: Bepaal de metadata van deze subset van dit informatieproduct
+      operationId: subset
+      parameters:
+        -
+          name: subset
+          in: path
+          description: >-
+            Subset geeft aan over welke subset men informatie wil opvragen
+          required: true
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/SubsetType'      
+      responses:
+        '200':
+          description: Een lijst met subsets voor dit informatieproduct
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Pagination-Count:
+              $ref: '#/components/headers/X-Pagination-Count'
+            X-Pagination-Page:
+              $ref: '#/components/headers/X-Pagination-Page'
+            X-Pagination-Limit:
+              $ref: '#/components/headers/X-Pagination-Limit'
+          content:
+            application/hal+json:
+              schema:
+                required:
+                  - _embedded
+                  - _links
+                  - page
+                type: object
+                properties:
+                  _embedded:
+                    required:
+                      - subset
+                    type: object
+                    properties:
+                      subset:
+                          $ref: '#/components/schemas/Subset'
+                  _links:
+                    $ref: '#/components/schemas/HalPaginationLinks'
+                  page:
+                    $ref: '#/components/schemas/Page'
+              examples:
+                response:
+                  $ref: '#/components/examples/SubsetSingleResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /subsets/{subset}/_zoek/:
+    summary: data
+    description: data
+    post:
+      tags:
+        - Subsets Zoeken
+      summary: Zoek binnen alle subsets van dit informatieproduct naar relevante informatie
+      description: Bepaal voor de opgegeven locatie en het opgegeven omgevingsaspect de beschikbare informatie
+      operationId: subsetszoek
+      parameters:
+        -
+          name: subset
+          in: path
+          description: >-
+            Subset geeft aan over welke subset men informatie wil opvragen
+          required: true
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/SubsetType'      
+        -
+          name: Content-Crs
+          in: header
+          description: >-
+            Content-Crs geeft het coördinaten stelsel wat gebruikt wordt om een locatie in het request aan te geven
+          required: true
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/CRS'
+      requestBody:
+        description: ZoekParameters
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoekParametersSubset'
+            examples:
+              request:
+                $ref: '#/components/examples/ZoekParametersSubsetRequest'
+        required: true
+      responses:
+        '200':
+          description: Meta data
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Pagination-Count:
+              $ref: '#/components/headers/X-Pagination-Count'
+            X-Pagination-Page:
+              $ref: '#/components/headers/X-Pagination-Page'
+            X-Pagination-Limit:
+              $ref: '#/components/headers/X-Pagination-Limit'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubsetInformatie'
+              examples:
+                response:
+                  $ref: '#/components/examples/SubsetInformatieResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/BadRequestResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        '406':
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotAcceptableResponse'
+        '412':
+          description: Precondition failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/PreconditionFailedResponse'
+        default:
+          description: Default error sample response
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /metadata:
+    summary: Meta data van dit informatieproduct
+    description: >-
+      Deze service levert metadata van dit informatieproduct.
+    get:
+      tags:
+        - MetaData
+      summary: Haal de metadata van dit informatieproduct op
+      description: >-
+        Voor dit informatieproduct wordt de volgende informatie opgehaald: 
+        
+        - organisatie, de naam van de organisatie die dit informatieproduct beschikbaar stelt
+        
+        - omschrijving, een omschrijving die aangeeft wat dit informatieproduct aan informatie kan leveren. Dit is altijd een heel globale omschrijving, omdat een informatieproduct meerdere subsets kan bevatten die allemaal hun eigen karakteristieken (kwaliteit/eenheden/actualiteit) kunnen hebben. De detail metainformatie van een te leveren product wordt getoond bij /subsets, omdat het dan mogelijk is per subset exact aan te geven wat de karakteristieken van het te leveren product zijn.
+        
+        - aanspreekpunt, wel hier in de omschrijving opgenomen maar nog niet in het schema. Is dat iets wat per organisatie handig/van belang is?
+        
+      operationId: metadata
+      responses:
+        '200':
+          description: Meta data
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Pagination-Count:
+              $ref: '#/components/headers/X-Pagination-Count'
+            X-Pagination-Page:
+              $ref: '#/components/headers/X-Pagination-Page'
+            X-Pagination-Limit:
+              $ref: '#/components/headers/X-Pagination-Limit'
+          content:
+            application/hal+json:
+              schema:
+                required:
+                  - _embedded
+                  - _links
+                  - page
+                type: object
+                properties:
+                  _embedded:
+                    required:
+                      - metadata
+                    type: object
+                    properties:
+                      metadata:
+                        $ref: '#/components/schemas/MetaData'
+                  _links:
+                    $ref: '#/components/schemas/HalPaginationLinks'
+                  page:
+                    $ref: '#/components/schemas/Page'
+              examples:
+                response:
+                  $ref: '#/components/examples/MetaDataResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/NotFoundResponse'
+        default:
+          description: Onverwacht probleem
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                response:
+                  $ref: '#/components/examples/ProblemResponse'
+                
+components:
+  examples:
+    MetaDataResponse:
+      summary: Voorbeeld van metadata response
+      description: >-
+              Voorbeeld voor metadata response
+      value:
+        _embedded:
+          metadata:
+            organisatie: IPO / Natuur
+            omschrijving: >-
+              Het informatie product natuur geeft informatie over de volgende onderwerpen:
+              
+              - Beschermde bomen
+              
+              - Bijendiversieteit
+              
+              - Boomhoogte
+              
+              - Lage vegetatie
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/metadata
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/metadata/1
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/metadata/1
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/metadata/1
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/metadata/1
+        page: 
+          size: 20
+          totalElements: 1
+          totalPages: 1
+          number: 0
+    BadRequestResponse:
+      summary: Ongeldig request
+      value:
+        type: ongeldig request
+        title: Bad request
+        status: 400
+        detail: Het aangeboden request voldoet niet aan de eisen en is niet te verwerken
+        instance: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/bijendiversiteit
+    NotAcceptableResponse:
+      summary: Niet geaccepteerd request
+      value:
+        type: niet geaccepteerd
+        title: NotAcceptable request
+        status: 406
+        detail: Het aangeboden request wordt niet geaccepteerd omdat er niet aan de vereisten voldaan is. Bv Content-Crs is niet opgegeven
+        instance: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/bijendiversiteit
+    NotFoundResponse:
+      summary: Niet gevonden
+      value:
+        type: niet gevonden
+        title: NotFound request
+        status: 404
+        detail: Het aangeboden request vindt geen resultaten
+        instance: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/bijendiversiteit
+    KaartlagenResponse:
+      summary: Voorbeeld lijst kaartlagen
+      value:
+        _embedded:
+          kaartlagen:
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland
+                natuurregelsIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland/natuurregels
+                wijstAan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland/locaties
+              identificatie: natuurnetwerkNederland
+              beleidNaam: Natuurnetwerk Nederland
+              beleidType: Beschermd natuurgebied
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/ganzenfoerageergebieden
+                natuurregelsIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/ganzenfoerageergebieden/natuurregels
+                wijstAan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/ganzenfoerageergebieden/locaties
+              identificatie: ganzenfoerageergebieden
+              beleidNaam: Ganzenfoerageergebieden
+              beleidType: Bescherming specifieke soorten
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen?page=0&size=2
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen?page=0&size=2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen?page=3&size=2
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen?page=3&size=2
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen?page=2&size=2
+        page: 
+          size: 2
+          totalElements: 2
+          totalPages: 3
+          number: 0
+    KaartlaagResponse:
+      summary: Voorbeeld kaartlaag
+      value:
+        _links:
+          self:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland
+          natuurregelsIn:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland/natuurregels
+          wijstAan:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/kaartlagen/natuurnetwerkNederland/locaties
+        identificatie: natuurnetwerkNederland
+        beleidNaam: Natuurnetwerk Nederland
+        beleidType: Beschermd natuurgebied
+    NatuurregelsResponse:
+      summary: Voorbeeld lijst natuurregels
+      value:
+        _embedded:
+          natuurregels:
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1
+                vanKrachtIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1/kaartlagen
+                wijstAan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1/locatie
+              identificatie: pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1
+              beleidTekst: <Al>Een omgevingsplan dat betrekking heeft op locaties binnen <b>
+                                          <IntIoRef eId="chp_6__subsec_6.2__subsec_6.2.1__art_6.17__para_1__ref_o_1"
+                                                    wId="pv26_1-0__chp_6__subsec_6.2__subsec_6.2.1__art_6.17__para_1__ref_o_1"
+                                                    ref="pv26_1-0__cmp_2__content_o_1__list_o_1__item_o_119__ref_o_1">Waardevolle houtopstanden</IntIoRef>
+                                       </b> bevat regels die strekken tot de bescherming van deze houtopstanden met inachtneming van de provinciale regels voor activiteiten houtopstanden en verzekert dat de kwaliteit en oppervlakte daarvan niet achteruitgaan en dat de samenhang tussen deze gebieden, de overige houtopstanden en het natuurnetwerk Nederland wordt behouden.</Al>
+              beleidBron: Omgevingsverordening Provincie Utrecht
+              beleidBronURL: https://omgevingswet.provincie-utrecht.nl/sites/omgevingswet/files/2020-09/UTR-0720-2170%20Interim_Omgevingsverordening_provincie_Utrecht_GS_A4_staand_v3_INTERACTIEF.pdf
+              bronhouder: Provincie Utrecht
+              brondatum: 4/9/2020
+              begindatum: 4/9/2020
+              einddatum: 4/9/2022
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_2
+                vanKrachtIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_2/kaartlagen
+                wijstAan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_2/locatie
+              identificatie: pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_2
+              beleidTekst:  <Al>De motivering op een omgevingsplan bevat een onderbouwing waaruit blijkt dat aan de genoemde voorwaarden in lid 1 is voldaan.</Al>
+              beleidBron: Omgevingsverordening Provincie Utrecht
+              beleidBronURL: https://omgevingswet.provincie-utrecht.nl/sites/omgevingswet/files/2020-09/UTR-0720-2170%20Interim_Omgevingsverordening_provincie_Utrecht_GS_A4_staand_v3_INTERACTIEF.pdf
+              bronhouder: Provincie Utrecht
+              brondatum: 4/9/2020
+              begindatum: 4/9/2020
+              einddatum: 4/9/2022
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels?page=0&size=2
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels?page=0&size=2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels?page=3&size=2
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels?page=3&size=2
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels?page=2&size=2
+        page: 
+          size: 2
+          totalElements: 2
+          totalPages: 3
+          number: 0
+    NatuurregelResponse:
+      summary: Voorbeeld wid
+      value:
+        _links:
+          self:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1
+          vanKrachtIn:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1/kaartlagen
+          wijstAan:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/natuurregels/pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1/locatie
+        identificatie: pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1
+        beleidTekst: <Al>Een omgevingsplan dat betrekking heeft op locaties binnen <b>
+                                    <IntIoRef eId="chp_6__subsec_6.2__subsec_6.2.1__art_6.17__para_1__ref_o_1"
+                                              wId="pv26_1-0__chp_6__subsec_6.2__subsec_6.2.1__art_6.17__para_1__ref_o_1"
+                                              ref="pv26_1-0__cmp_2__content_o_1__list_o_1__item_o_119__ref_o_1">Waardevolle houtopstanden</IntIoRef>
+                                 </b> bevat regels die strekken tot de bescherming van deze houtopstanden met inachtneming van de provinciale regels voor activiteiten houtopstanden en verzekert dat de kwaliteit en oppervlakte daarvan niet achteruitgaan en dat de samenhang tussen deze gebieden, de overige houtopstanden en het natuurnetwerk Nederland wordt behouden.</Al>
+        beleidBron: Omgevingsverordening Provincie Utrecht
+        beleidBronURL: https://omgevingswet.provincie-utrecht.nl/sites/omgevingswet/files/2020-09/UTR-0720-2170%20Interim_Omgevingsverordening_provincie_Utrecht_GS_A4_staand_v3_INTERACTIEF.pdf
+        bronhouder: Provincie Utrecht
+        brondatum: 4/9/2020
+        begindatum: 4/9/2020
+        einddatum: 4/9/2022
+    LocatiesResponse:
+      summary: Voorbeeld lijst locaties
+      value:
+        _embedded:
+          locaties:
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101
+                geometrie:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/geometrie
+                locatieVan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/kaartlagen
+                natuurregelsIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/natuurregels
+              identificatie: IMNaIKNProvincieUtrecht101
+              bronhouder: Provincie Utrecht
+            -
+              _links:
+                self:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht102
+                geometrie:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht102/geometrie
+                locatieVan:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht102/kaartlagen
+                natuurregelsIn:
+                  href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht102/natuurregels
+              identificatie: IMNaIKNProvincieUtrecht102
+              bronhouder: Provincie Utrecht
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties?page=0&size=2
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties?page=0&size=2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties?page=3&size=2
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties?page=3&size=2
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties?page=2&size=2
+        page: 
+          size: 2
+          totalElements: 2
+          totalPages: 3
+          number: 0
+    LocatieResponse:
+      summary: Voorbeeld locatie
+      value:
+        _links:
+          self:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101
+          geometrie:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/geometrie
+          locatieVan:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/kaartlagen
+          natuurregelsIn:
+            href: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/locaties/IMNaIKNProvincieUtrecht101/natuurregels
+        identificatie: IMNaIKNProvincieUtrecht101
+        bronhouder: Provincie Utrecht
+    OmgevingsAspectenResponse:
+      summary: Voorbeeld lijst omgevingsaspecten
+      value:
+        _embedded:
+          omgevingsaspecten:
+            -
+              naam: groenbeheer
+              subsets: 
+                - beschermdebomen
+            -
+              naam: soortendiversiteit
+              subsets: 
+                - bijendiversiteit        
+                - boomsoorten
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/omgevingsaspecten
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/omgevingsaspecten/2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/omgevingsaspecten/20
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/omgevingsaspecten/1
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/omgevingsaspecten/3
+        page: 
+          size: 20
+          totalElements: 1
+          totalPages: 1
+          number: 0
+    ProblemResponse:
+      summary: Onverwacht probleem
+      value:
+        type: onverwacht probleem
+        title: Onverwacht probleem
+        status: 412
+        detail: Er is een onverwacht probleem opgetreden
+        instance: https://service.omgevingswet.overheid.nl/publiek/natuur/api/bijendiversiteit/v1/metadata
+    PreconditionFailedResponse:
+      summary: Precondities voldoen niet
+      value:
+        type: precondities voldoen niet
+        title: Precondition failed request
+        status: 412
+        detail: Het aangeboden request voldoet niet aan de precondities
+        instance: https://service.omgevingswet.overheid.nl/publiek/natuur/api/bijendiversiteit/v1/metadata
+    SubsetInformatieResponse:
+      summary: Resultaat van een bevraging van één of meerdere subsets
+      value:
+        _embedded:
+          -
+            subset: bijendiversiteit
+            subsetinfo:
+                -
+                  omgevingsaspect: soortendiversiteit
+                  naam: aantal soorten bijen
+                  waarde: 12
+                  type: number
+                -
+                  omgevingsaspect: soortendiversiteit
+                  naam: Omschrijving aantal soorten bijen
+                  waarde: Het aantal soorten bijen wordt weergegeven in aantal soorten per m2
+                  type: string
+                -
+                  omgevingsaspect: soortendiversiteit
+                  naam: aantal soorten hommels
+                  waarde: 25
+                  type: number
+                -
+                  omgevingsaspect: soortendiversiteit
+                  naam: extra informatie soorten bijen
+                  waarde: https://www.atlasleefomgeving.nl/kaarten
+                  type: url
+                -
+                  omgevingsaspect: soortendiversiteit
+                  naam: habitat bijen
+                  waarde:
+                    type: Polygon
+                    coordinates:
+                      items:
+                        -
+                          - 161668 
+                          - 446177
+                        -           
+                          - 161668 
+                          - 446567
+                        -           
+                          - 162094 
+                          - 446567
+                        -           
+                          - 162094 
+                          - 446177
+                        -
+                          - 161668 
+                          - 446177
+                  type: geometrie
+                  
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek/2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek/20
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek/1
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek/3
+        page:
+          size: 20
+          totalElements: 1
+          totalPages: 1
+          number: 0
+    SubsetResponse:
+      summary: Beschikbare subsets voor dit informatieproduct
+      value:
+        _embedded:
+          subsets:
+            -
+              subset: bijendiversiteit
+              laatstbijgewerkt: 2019-04-28T09:00:00Z/
+              omschrijving: >-
+                De informatie die voor bijendiversiteit aanwezig is. De bijendiversieteit wordt uitgedrukt in het aantal bijen soorten per km2.
+              omgevingsaspecten: 
+                - groenbeheer
+                - soortendiversiteit
+              href: 'https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit'
+              geometry:
+                type: Polygon
+                coordinates:
+                  items:
+                    -
+                      - 161668 
+                      - 446177
+                    -           
+                      - 161668 
+                      - 446567
+                    -           
+                      - 162094 
+                      - 446567
+                    -           
+                      - 162094 
+                      - 446177
+                    -
+                      - 161668 
+                      - 446177
+            -
+              subset: boomsoorten
+              laatstbijgewerkt: 2019-04-28T09:00:00/+01:00
+              omschrijving: >-
+                De informatie die voor bomen aanwezig is. Hier wordt het % van alle bomen die hoger zijn dan 2,5m op een oppervlakte van 1 m2 getoond.
+              omgevingsaspecten: 
+                - soortendiversiteit
+              href: 'https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/boomsoorten'       
+              geometry:
+                type: Polygon
+                coordinates:
+                  items:
+                    -
+                      - 161668 
+                      - 446177
+                    -           
+                      - 161668 
+                      - 446567
+                    -           
+                      - 162094 
+                      - 446567
+                    -           
+                      - 162094 
+                      - 446177
+                    -
+                      - 161668 
+                      - 446177
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/2
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/20
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/1
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/3
+        page: 
+          size: 20
+          totalElements: 1
+          totalPages: 1
+          number: 0
+    SubsetSingleResponse:
+      summary: Beschikbare informatie voor subset bijendiversiteit
+      value:
+        _embedded:
+          subset: bijendiversiteit
+          laatstbijgewerkt: 2019-04-28T09:00:00Z/
+          omschrijving: >-
+            De informatie die voor bijendiversiteit aanwezig is. De bijendiversieteit wordt uitgedrukt in het aantal bijen soorten per km2.
+          omgevingsaspecten: 
+            - groenbeheer
+            - soortendiversiteit
+          href: 'https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/_zoek'
+          geometry:
+            type: Polygon
+            coordinates:
+              items:
+                -
+                  - 161668 
+                  - 446177
+                -           
+                  - 161668 
+                  - 446567
+                -           
+                  - 162094 
+                  - 446567
+                -           
+                  - 162094 
+                  - 446177
+                -
+                  - 161668 
+                  - 446177     
+        _links:
+          self: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit
+          first: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/1
+          last: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/1
+          prev: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/1
+          next: https://service.omgevingswet.overheid.nl/publiek/natuur/api/v1/subsets/bijendiversiteit/1
+        page: 
+          size: 20
+          totalElements: 1
+          totalPages: 1
+          number: 0
+    ZoekParametersSubsetRequest:
+      summary: Voorbeeld van zoekparameters
+      value:
+        geo:
+          geometry:
+            type: Polygon
+            coordinates:
+              items:
+                -
+                  - 161668 
+                  - 446177
+                -           
+                  - 161668 
+                  - 446567
+                -           
+                  - 162094 
+                  - 446567
+                -           
+                  - 162094 
+                  - 446177
+                -
+                  - 161668 
+                  - 446177   
+          spatialOperator: contains
+        omgevingsaspecten:
+          - soortendiversiteit
+          - groenbeheer
+  headers:
+    X-Total-Count:
+      description: Totaal aantal objecten
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        example: 100
+    X-Pagination-Count:
+      description: Totaal aantal pagina's.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        example: 3
+    X-Pagination-Page:
+      description: Huidige pagina.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        example: 1
+    X-Pagination-Limit:
+      description: Objecten per pagina.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        example: 3
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotAcceptable:
+      description: Not acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PreconditionFailed:
+      description: Precondition failed
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Identificatie:
+      title: Identificatie
+      type: string
+    CRS:
+      type: string
+      enum: 
+        - epsg:3856
+        - epsg:4258
+        - epsg:28992
+      default: epsg:28992
+      description: >-
+        Conform de api strategie van DSO wordt er content-negotion gebruikt om het juiste coördinaten stelsel vast te leggen
+    GeoJsonGeometry:
+      title: GeoJSON Geometry
+      description: Geometrie in GeoJSON formaat (RFC 7946).
+      externalDocs:
+        description: RFC 7946 - The GeoJSON Format
+        url: https://tools.ietf.org/html/rfc7946
+      oneOf:
+        - $ref: '#/components/schemas/Point'
+        - $ref: '#/components/schemas/LineString'
+        - $ref: '#/components/schemas/Polygon'
+        - $ref: '#/components/schemas/MultiPoint'
+        - $ref: '#/components/schemas/MultiLineString'
+        - $ref: '#/components/schemas/MultiPolygon'
+    GeoJsonZoekObject:
+      type: object
+      required:
+        - geometrie
+        - spatialOperator
+      properties:
+        geometrie: 
+         $ref: '#/components/schemas/GeoJsonGeometry'
+        spatialOperator:
+          $ref: '#/components/schemas/SpatialOperator' 
+    HalCollectionLinks:
+      type: object
+      properties:
+        self:
+          type: object
+          properties:
+            href:
+              $ref: '#/components/schemas/Href'
+      description: uri van de api aanroep die tot dit resultaat heeft geleid
+    HalPaginationLinks:
+      allOf:
+        - $ref: '#/components/schemas/HalCollectionLinks'
+        - type: object
+          properties:
+            first:
+              type: object
+              properties:
+                href: 
+                  $ref: '#/components/schemas/Href'
+                title:
+                  type: string
+                  example: Eerste pagina
+            last:
+              type: object
+              properties:
+                href: 
+                  $ref: '#/components/schemas/Href'
+                title:
+                  type: string
+                  example: Laatste pagina
+            prev:
+              type: object
+              properties:
+                href: 
+                  $ref: '#/components/schemas/Href'
+                title:
+                  type: string
+                  example: Vorige pagina
+            next:
+              type: object
+              properties:
+                href: 
+                  $ref: '#/components/schemas/Href'
+                title:
+                  type: string
+                  example: Volgende pagina
+    Href:
+      type: string
+      format: uri
+      example: https://service.omgevingswet.overheid.nl/publiek/natuur/api/bijendiversiteit/v1/metadata
+    LineString:
+      title: GeoJSON LineString
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - LineString
+        coordinates:
+          minItems: 2
+          type: array
+          items:
+            minItems: 2
+            type: array
+            items:
+              type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    Kaartlagen:
+      required:
+        - _embedded
+        - _links
+        - page
+      type: object
+      description: Standaard structuur van alle kaartlagen die geretourneerd worden.
+      properties:
+        _embedded:
+          required:
+            - kaartlagen
+          type: object
+          properties:
+            kaartlagen:
+              type: array
+              items:
+                $ref: '#/components/schemas/Kaartlaag'
+        _links:
+          $ref: '#/components/schemas/HalPaginationLinks'
+        page:
+          $ref: '#/components/schemas/Page'
+    Kaartlaag:
+      title: Kaartlaag
+      type: object
+      description: Data van een enkel kaartlaag.
+      allOf:
+        - $ref: '#/components/schemas/Kaartlaagaanwijzing'
+        - required:
+            - groep
+            - label
+            - naam
+          #properties:
+    Kaartlaagaanwijzing:
+      title: Kaartlaagaanwijzing
+      required:
+        - _links
+        - identificatie
+        - subType
+      type: object
+      properties:
+        _links:
+          $ref: '#/components/schemas/KaartlaagaanwijzingLinks'
+        identificatie:
+          $ref: '#/components/schemas/Identificatie'
+        beleidNaam:
+              title: beleidNaam
+              type: string
+              description: 'Een (korte) omschrijving van de functie.. '
+        beleidType:
+          type: string
+      #description: Type gebied aangewezen door een juridische regel.
+      #discriminator:
+        #propertyName: subType
+        #mapping:
+          #gebied: Gebied
+          #beleid: Beleid
+    KaartlaagaanwijzingLinks:
+      required:
+        - self
+        - wijstAan
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/HalLink'
+        natuurregelsIn:
+          $ref: '#/components/schemas/HalLink'
+        wijstAan:
+          $ref: '#/components/schemas/HalLink'
+    
+    Natuurregels:
+      required:
+        - _embedded
+        - _links
+        - page
+      type: object
+      description: Standaard structuur van alle Beleiden die geretourneerd worden.
+      properties:
+        _embedded:
+          required:
+            - natuurregels
+          type: object
+          properties:
+            natuurregels:
+              type: array
+              items:
+                $ref: '#/components/schemas/Natuurregel'
+        _links:
+          $ref: '#/components/schemas/HalPaginationLinks'
+        page:
+          $ref: '#/components/schemas/Page'
+    Natuurregel:
+      title: Natuurregel
+      type: object
+      description: Data van een enkel gebied.
+      allOf:
+        - $ref: '#/components/schemas/Natuurregelaanwijzing'
+        - required:
+            - groep
+            - label
+            - naam
+          #properties:
+    Natuurregelaanwijzing:
+      title: Natuurregelaanwijzing
+      required:
+        - _links
+        - identificatie
+        - subType
+      type: object
+      properties:
+        _links:
+          $ref: '#/components/schemas/NatuurregelaanwijzingLinks'
+        identificatie:
+          $ref: '#/components/schemas/Identificatie'
+        beleidTekst:
+              type: string
+              description: 'De tekst die bij de natuurregel hoort'
+        beleidBron:
+          type: string
+        beleidBronURL:
+          type: string
+        bronhouder:
+          type: string
+        brondatum:
+          type: string
+        begindatum:
+          type: string
+        einddatum:
+          type: string
+      #description: Type gebied aangewezen door een juridische regel.
+      #discriminator:
+        #propertyName: subType
+        #mapping:
+          #gebied: Gebied
+          #beleid: Beleid
+    NatuurregelaanwijzingLinks:
+      required:
+        - self
+        - wijstAan
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/HalLink'
+        vanKrachtIn:
+          $ref: '#/components/schemas/HalLink'
+        wijstAan:
+          $ref: '#/components/schemas/HalLink'
+          
+    Locaties:
+      required:
+        - _embedded
+        - _links
+        - page
+      type: object
+      description: Standaard structuur van alle Locaties die geretourneerd worden.
+      properties:
+        _embedded:
+          required:
+            - locaties
+          type: object
+          properties:
+            locaties:
+              type: array
+              items:
+                $ref: '#/components/schemas/Locatie'
+        _links:
+          $ref: '#/components/schemas/HalPaginationLinks'
+        page:
+          $ref: '#/components/schemas/Page'
+    Locatie:
+      title: Locatie
+      type: object
+      description: Data van een enkel gebied.
+      allOf:
+        - $ref: '#/components/schemas/Locatieaanwijzing'
+        - required:
+            - groep
+            - label
+            - naam
+          #properties:
+    Locatieaanwijzing:
+      title: Locatieaanwijzing
+      required:
+        - _links
+        - identificatie
+        - subType
+      type: object
+      properties:
+        _links:
+          $ref: '#/components/schemas/LocatiesaanwijzingLinks'
+        identificatie:
+          $ref: '#/components/schemas/Identificatie'
+        bronhouder:
+          type: string
+    LocatiesaanwijzingLinks:
+      required:
+        - self
+        - wijstAan
+      type: object
+      properties:
+        self:
+          $ref: '#/components/schemas/HalLink'
+        geometrie:
+          $ref: '#/components/schemas/HalLink'
+        locatieVan:
+          $ref: '#/components/schemas/HalLink'
+        beleidIn:
+          $ref: '#/components/schemas/HalLink'
+          
+    HalLink:
+      required:
+        - href
+      type: object
+      properties:
+        href:
+          type: string
+      description: HAL link.
+    GeoJsonZoekobject:
+      type: object
+      properties:
+        geometrie:
+            $ref: '#/components/schemas/GeoJsonGeometry'
+        spatialOperator:
+          type: string
+          description: Een uit de set van spatial operators die gedefinieerd zijn in ISO 19125-1
+          enum:
+            - intersects
+            - within
+            - contains
+    GeoZoekobject:
+      required:
+        - geo
+      type: object
+      properties:
+        geo:
+          $ref: '#/components/schemas/GeoJsonZoekobject'
+      description: Zoekobject voor specifieke geo-bevragingen.
+      example:
+        geo:
+          geometrie:
+            type: Point
+            coordinates:
+              - 139784
+              - 442870
+          spatialOperator: intersects
+          
+    InformatieProduct:
+      description: De gegevens van een omgevingsaspect
+      type: object
+      required: 
+        - omgevingsaspect
+        - naam
+        - waarde
+        - type
+      properties:
+        omgevingsaspect:
+          type: string
+          description: De naam van het omgevingsaspect
+        naam: 
+          type: string
+          description: De naam van de parameter
+        waarde:
+          oneOf:
+            - type: string
+            - type: number
+            - $ref: '#/components/schemas/GeoJsonGeometry'
+          description: De waarde van de parameter gerepresenteerd als een string
+        type:
+          type: string
+          enum: 
+            - string
+            - number
+            - geometrie
+            - url
+          default: string
+    MetaData:
+      type: object
+      properties:
+        organisatie:
+          type: string
+          description: De organisatie die dit informatieproduct beschikbaar stelt
+        omschrijving:
+          type: string
+          description: Omschrijving van dit informatieproduct
+    MultiLineString:
+      title: GeoJSON MultiLineString
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - MultiLineString
+        coordinates:
+          type: array
+          items:
+            minItems: 2
+            type: array
+            items:
+              minItems: 2
+              type: array
+              items:
+                type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    MultiPoint:
+      title: GeoJSON MultiPoint
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - MultiPoint
+        coordinates:
+          type: array
+          items:
+            minItems: 2
+            type: array
+            items:
+              type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    MultiPolygon:
+      title: GeoJSON MultiPolygon
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - MultiPolygon
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              minItems: 4
+              type: array
+              items:
+                minItems: 2
+                type: array
+                items:
+                  type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    OmgevingsAspect:
+      description: De gegevens van een omgevingsaspect
+      type: object
+      required: 
+        - naam
+        - subsets
+      properties:
+        naam: 
+          type: string
+          description: De naam van het omgevingsaspect
+        subsets:
+          type: array
+          items:
+            type: string
+    OmgevingsAspecten:
+          type: array
+          minItems: 1
+          items: 
+            type: string
+    Page:
+      required:
+        - number
+        - size
+        - totalElements
+        - totalPages
+      type: object
+      properties:
+        size:
+          type: integer
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          format: int32
+          example: 1
+        totalPages:
+          type: integer
+          format: int32
+          example: 1
+        number:
+          type: integer
+          format: int32
+          example: 0
+    Point:
+      title: GeoJSON Point
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Point
+        coordinates:
+          minItems: 2
+          type: array
+          items:
+            type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    Polygon:
+      title: GeoJSON Polygon
+      required:
+        - coordinates
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Polygon
+        coordinates:
+          type: array
+          items:
+            minItems: 4
+            type: array
+            items:
+              minItems: 2
+              type: array
+              items:
+                type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Absolute URI die het probleemtype identificeert.
+          format: uri
+          default: about:blank
+        title:
+          type: string
+          description: >-
+            Een korte samenvatting van het probleemtype bedoeld voor
+            ontwikkelaars. 
+        status:
+          maximum: 600
+          exclusiveMaximum: true
+          minimum: 100
+          type: integer
+          description: >-
+            De HTTP statuscode gegenereerd door de server waar het probleem zich
+            voordoet. 
+          format: int32
+          example: 503
+        detail:
+          type: string
+          description: Mens-leesbare uitleg van dit specifieke probleem.
+          example: Er is een onbekend probleem opgetreden
+        instance:
+          type: string
+          description: Absolute URI dat dit specifieke probleem identificeert.
+          format: uri
+      description: >-
+        Standaardformaat (`application/problem+json`) voor probleemdetails in
+        HTTP API's (RFC 7807).
+    SpatialOperator:
+      type: string
+      description: Een uit de set van spation operators die gedefinieerd zijn in ISO 19125-1
+      enum:
+        - intersects
+        - within
+        - contains
+    Subset:
+      type: object
+      required:
+        - subset
+        - laatstbijgewerkt
+        - omgevingsaspecten
+        - url
+        - gebied
+      properties:
+        subset:
+          type: string
+          description: De naam van deze subset voor dit informatieproduct
+        laatstbijgewerkt:
+          type: string
+          format: date-time
+          description: De datum dat de informatie voor het laatst bijgewerkt is conform format uit RFC3339
+        omschrijving:
+          type: string
+          description: Omschrijving van de subset voor dit informatieproduct
+        omgevingsaspecten:
+          $ref: '#/components/schemas/OmgevingsAspecten'
+        url:
+          $ref: '#/components/schemas/Href'
+        gebied:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+    SubsetInformatie:
+      description: De gegevens van een omgevingsaspect
+      type: object
+      required: 
+        - subset
+        - omgevingsaspect
+        - naam
+        - waarde
+        - type
+      properties:
+        subset:
+          type: string
+        subsetinfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/InformatieProduct'
+    SubsetType:
+      type: string
+    ZoekParametersSubset:
+      required: 
+      - geo
+      - omgevingsaspecten
+      type: object
+      properties:
+        geo:
+          $ref: '#/components/schemas/GeoJsonZoekObject'
+        omgevingsaspecten:
+          $ref: '#/components/schemas/OmgevingsAspecten'
+  parameters:
+    AcceptCrsHeader:
+      name: Accept-Crs
+      in: header
+      description: Accept-Crs
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: 'EPSG:28992'
+        enum:
+          - 'EPSG:28992'
+    Identificatie:
+      name: identificatie
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: natuurnetwerkNederland
+    IdentificatieNatuurregel:
+      name: identificatie
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: pv26_1-0__chp_6__subsec_6_2__subsec_6_2_1__art_6_17__para_1
+    IdentificatieLocatie:
+      name: identificatie
+      in: path
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: IMNa_IKN_ProvincieUtrecht_101
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API key to authorize requests.
+      name: api_key
+      in: header 
+security:
+  - api_key: []
